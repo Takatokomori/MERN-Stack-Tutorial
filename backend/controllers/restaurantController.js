@@ -17,7 +17,7 @@ const getRestaurant = async(req, res)=>{
   if(!mongoose.Types.ObjectId.isValid(id)){
     return res.status(404).json({mgs:"Faild to find this object"})
   }
-  const restaurant = await Restaurant.findById(id)
+  const restaurant = await Restaurant.findById({ _id:id })
 
   if(!restaurant){
     return res.status(404).json({stauts: false, msg:"Restaurant Data Not Found"})
@@ -28,6 +28,18 @@ const getRestaurant = async(req, res)=>{
 // create new
 const createRestaurant = async(req, res) =>{
   const {title, cuisine} = req.body
+  const emptyFields = []
+  
+  // empty handling
+  if(!title){
+    emptyFields.push("title")
+  }
+  if(!cuisine){
+    emptyFields.push("cuisine")
+  }
+  if(emptyFields.length > 0){
+    return res.status(400).json({error: "Please fill in all the field.", emptyFields})
+  }
 
   try{
     const restaurant = await Restaurant.create({ title, cuisine })
@@ -52,7 +64,7 @@ const editRestaurant = async (req, res) =>{
   if(!restaurant){
     return res.status(404).json({stauts: false, msg:"Restaurant Data Not Found"})
   }
-  res.status(200).json({status: true, msg: "Update sucessfully"})
+  res.status(200).json(restaurant)
 }
 
 
